@@ -1,6 +1,9 @@
 import base64
 import hashlib
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Esto corrige la vulnerabilidad CWE-798 (Use of Hard-coded Credentials): leemos
 # la llave secreta desde una variable del sistema, no del código. Así no queda

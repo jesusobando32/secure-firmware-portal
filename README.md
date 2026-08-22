@@ -1,94 +1,79 @@
-# Portal de Gestión de Actualizaciones y Firmwares — versión arreglada
+# 🛡️ Portal Seguro de Actualización de Firmware
 
-Esta es la **versión segura** de nuestro proyecto de Ciberseguridad (UCAB). Es la misma
-página web de antes (el portal de actualizaciones con su login y su panel de admin),
-pero con las **dos fallas ya corregidas**. Toda la seguridad la escribimos a mano, sin
-usar librerías que la resuelvan solas (así lo pide la materia).
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0.3-black?style=for-the-badge&logo=flask&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Security](https://img.shields.io/badge/Security-OWASP_Top_10-red?style=for-the-badge&logo=owasp&logoColor=white)
 
-## Qué se arregló
+Una plataforma web segura diseñada para gestionar y desplegar actualizaciones de firmware. Este proyecto demuestra la implementación práctica de mecanismos de ciberseguridad robustos para mitigar vulnerabilidades críticas del OWASP Top 10, centrándose específicamente en Fallas Criptográficas (A02) y Fallas de Integridad del Software y Datos (A08).
 
-- **A04 – Criptografía:** antes las contraseñas se guardaban con MD5 (débil) y el token
-  se podía falsificar. Ahora las contraseñas se protegen con un método lento y con
-  "sal" hecho a mano (PBKDF2 + HMAC), y el token va **firmado**: si alguien lo modifica,
-  el servidor lo rechaza. La llave secreta ya no está en el código, se pone en una
-  variable del sistema.
-- **A08 – Integridad:** antes el servidor ejecutaba cualquier paquete que le subieran.
-  Ahora revisa que el archivo sea de verdad un `.zip`/`.tar`, comprueba una **firma**
-  para saber que es legítimo, y **nunca ejecuta** nada de adentro.
+## ✨ Características Principales
 
-Resultado: el mismo ataque que funcionaba en la rama `version-vulnerable` aquí **ya no
-funciona** (eso es la "validación de cierre").
+- **Implementación Criptográfica a Medida:** Algoritmos PBKDF2 + HMAC escritos a mano para el hash de contraseñas (reemplazando al débil MD5), demostrando una comprensión profunda de las primitivas criptográficas.
+- **Gestión de Sesiones a Prueba de Manipulaciones:** Tokens de autenticación firmados que previenen la falsificación y el escalado de privilegios.
+- **Carga de Archivos Segura y Verificación de Integridad:** Validación estricta de los paquetes de firmware subidos (`.zip`/`.tar`) mediante firmas digitales para prevenir la Ejecución Remota de Código (RCE) y el despliegue de cargas maliciosas.
+- **Control de Acceso Basado en Roles (RBAC):** Paneles de control y capacidades diferenciadas para operadores estándar y administradores.
 
-## Las dos ramas
+## 🏗️ Arquitectura y Stack Tecnológico
 
-- `version-vulnerable` → la app con las fallas.
-- `version-asegurada` → esta, la app ya corregida.
+- **Backend:** Python / Flask
+- **Base de Datos:** SQLite (Almacenamiento ligero y sin servidor)
+- **Frontend:** HTML, CSS, Plantillas Jinja2
+- **Seguridad:** Uso nativo de `hashlib` y `hmac` en Python para operaciones criptográficas manuales (No se utilizaron librerías de autenticación de terceros para mostrar la mecánica de seguridad subyacente).
 
-## Con qué está hecho
+## 🚀 Empezando
 
-- **Backend (el servidor):** Python con Flask
-- **Base de datos:** SQLite (`portal.db`)
-- **Frontend (lo que se ve):** HTML, CSS y plantillas Jinja2
+### Requisitos Previos
+- Python 3.8+
 
-## Cómo levantar la app
-
-Esta versión necesita **una cosa extra**: una llave secreta puesta en una variable del
-sistema (`PORTAL_SECRET`). Si no la pones, la app no arranca (a propósito, para no dejar
-la llave en el código).
-
-**En Windows (PowerShell):**
-
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-$env:PORTAL_SECRET = "una-clave-larga-y-cualquiera"
-python init_db.py      # crea la base de datos con los usuarios
-python app.py          # levanta el servidor
-```
-
-**En Linux / la VM (Ubuntu):**
+### Instalación y Ejecución (Windows / Linux)
 
 ```bash
-python3 -m venv venv && source venv/bin/activate
+git clone https://github.com/jesusobando32/Cyberseq.git
+cd Cyberseq
+
+# 1. Crea y activa un entorno virtual
+python -m venv venv
+# En Windows:
+.\venv\Scripts\Activate.ps1
+# En Linux:
+source venv/bin/activate
+
+# 2. Instala las dependencias
 pip install -r requirements.txt
-export PORTAL_SECRET='una-clave-larga-y-cualquiera'
-python3 init_db.py
-python3 app.py
+
+# 3. Variables de Entorno (.env)
+# El proyecto utiliza un archivo .env para su configuración. Ya ha sido configurado para desarrollo local.
+# Puedes copiar .env.example a .env y configurar tu propio PORTAL_SECRET si lo deseas.
+
+# 4. Inicializa la base de datos y ejecuta el servidor
+python init_db.py
+python app.py
 ```
+*Accede a la aplicación en `http://localhost:5000`.*
 
-Cuando arranque, abre en el navegador: **http://localhost:8080**
-(o, si es la VM, `http://<IP_VICTIMA>:8080`)
+### Credenciales de Prueba
+| Rol | Usuario | Contraseña |
+|------|----------|----------|
+| Usuario | `operador` | `operador123` |
+| Admin| `admin` | `SuperAdmin2026!` |
 
-Para apagar el servidor: `Ctrl + C`.
+## 🛡️ Postura Defensiva de Seguridad
 
-### Usuarios para entrar
+Esta rama "asegurada" es resistente contra ataques comunes:
+1. **Falsificación de Token de Admin:** Falla controladamente; el servidor rechaza cookies modificadas debido a firmas HMAC inválidas.
+2. **Carga de Paquetes Maliciosos:** Falla; el servidor verifica la integridad y la firma antes de procesar cualquier archivo, previniendo la ejecución de código arbitrario.
 
-| usuario  | contraseña      | rol           |
-|----------|-----------------|---------------|
-| operador | operador123     | usuario normal |
-| admin    | SuperAdmin2026! | administrador  |
+## 📸 Galería de la Interfaz
 
-## Probar que el ataque ya NO funciona
+### 1. Panel de Autenticación
+Demostración de la UI de inicio de sesión seguro.
+![Pantalla de Login](docs/login_screen.png)
 
-Para la parte defensiva de la demo, se corren **los mismos scripts de ataque** de la
-carpeta `red-team/` (que están en la rama `version-vulnerable`) contra esta versión, y
-se ve que fallan:
+### 2. Catálogo y Dashboard Principal
+Vista para usuarios autenticados con los firmwares disponibles.
+![Dashboard Principal](docs/dashboard.png)
 
-- El script que falsifica el token de admin: aquí el token no tiene la firma correcta,
-  así que el servidor responde "no autorizado".
-- El script que sube el paquete malicioso: se rechaza porque no trae una firma válida, y
-  además nada se ejecuta.
-
-## Las rutas de la app (endpoints)
-
-| Método | Ruta             | Qué hace                        | Cómo está protegida       |
-|--------|------------------|---------------------------------|---------------------------|
-| GET    | `/`              | Pantalla de login               | —                         |
-| POST   | `/login`         | Entrar (usa PBKDF2 a mano)      | contraseña con sal        |
-| GET    | `/dashboard`     | Panel del usuario               | token firmado con HMAC    |
-| GET    | `/admin`         | Panel de carga (solo admin)     | —                         |
-| POST   | `/upload-update` | Sube un paquete firmado         | revisa firma + tipo real  |
-
-> Nota: en esta versión ya no existe la ruta `/api/config` (se quitó porque filtraba
-> información).
+### 3. Panel de Administración
+Consola restringida para la carga segura de actualizaciones.
+![Panel de Administración](docs/admin_panel.png)
