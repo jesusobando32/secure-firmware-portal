@@ -14,6 +14,14 @@ Una plataforma web segura diseñada para gestionar y desplegar actualizaciones d
 - **Carga de Archivos Segura y Verificación de Integridad:** Validación estricta de los paquetes de firmware subidos (`.zip`/`.tar`) mediante firmas digitales para prevenir la Ejecución Remota de Código (RCE) y el despliegue de cargas maliciosas.
 - **Control de Acceso Basado en Roles (RBAC):** Paneles de control y capacidades diferenciadas para operadores estándar y administradores.
 
+## 👥 Equipo y mi rol
+
+Proyecto en equipo de la UCAB. Me encargué del **frontend**: las plantillas Jinja2, los estilos y las pantallas de login, dashboard y administración.
+
+## 🔍 Versión vulnerable vs. versión segura
+
+El archivo `crypto_vuln.py` es una versión **vulnerable a propósito** (MD5 sin sal y una llave escrita en el código), incluida solo para comparar con `crypto_secure.py` y mostrar qué se corrigió. No debe usarse en producción.
+
 ## 🏗️ Arquitectura y Stack Tecnológico
 
 - **Backend:** Python / Flask
@@ -29,8 +37,8 @@ Una plataforma web segura diseñada para gestionar y desplegar actualizaciones d
 ### Instalación y Ejecución (Windows / Linux)
 
 ```bash
-git clone https://github.com/jesusobando32/Cyberseq.git
-cd Cyberseq
+git clone https://github.com/jesusobando32/secure-firmware-portal.git
+cd secure-firmware-portal
 
 # 1. Crea y activa un entorno virtual
 python -m venv venv
@@ -43,8 +51,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 3. Variables de Entorno (.env)
-# El proyecto utiliza un archivo .env para su configuración. Ya ha sido configurado para desarrollo local.
-# Puedes copiar .env.example a .env y configurar tu propio PORTAL_SECRET si lo deseas.
+# Copia el archivo de ejemplo y define tu propio PORTAL_SECRET:
+# Linux/Mac:  cp .env.example .env
+# Windows:    copy .env.example .env
 
 # 4. Inicializa la base de datos y ejecuta el servidor
 python init_db.py
@@ -60,7 +69,7 @@ python app.py
 
 ## 🛡️ Postura Defensiva de Seguridad
 
-Esta rama "asegurada" es resistente contra ataques comunes:
+Esta versión asegurada resiste ataques comunes:
 1. **Falsificación de Token de Admin:** Falla controladamente; el servidor rechaza cookies modificadas debido a firmas HMAC inválidas.
 2. **Carga de Paquetes Maliciosos:** Falla; el servidor verifica la integridad y la firma antes de procesar cualquier archivo, previniendo la ejecución de código arbitrario.
 

@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Que GitHub cuente el proyecto como Python y no como HTML
+templates/** linguist-detectable=false
+static/** linguist-detectable=false

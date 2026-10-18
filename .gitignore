@@ -3,3 +3,6 @@ __pycache__/
 portal.db
 uploads/
 paquetes_extraidos/
+
+# Variables de entorno (usa .env.example como plantilla)
+.env
